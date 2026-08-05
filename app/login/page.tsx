@@ -37,7 +37,7 @@ function LoginForm() {
 
     try {
       if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
+        const { data: signUpData, error } = await supabase.auth.signUp({
           email,
           password,
           options: {
@@ -48,7 +48,16 @@ function LoginForm() {
           },
         });
         if (error) throw error;
-        toast.success("Account created. Check your inbox to confirm, then sign in.");
+
+        // If email confirmation is disabled in Supabase, the user is already
+        // logged in after signUp — redirect them immediately.
+        if (signUpData.session) {
+          const destination = role === "teacher" ? "/teacher/dashboard" : "/student/dashboard";
+          window.location.href = destination;
+          return;
+        }
+
+        toast.success("Account created! Check your inbox to confirm your email, then sign in.");
         setMode("signin");
         setLoading(false);
         return;
@@ -57,18 +66,25 @@ function LoginForm() {
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
 
+      // Try to get role from the profiles table; fall back to auth metadata
+      // if the profile row hasn't been created yet (e.g. trigger delay).
       const { data: profile } = await supabase
         .from("profiles")
         .select("role")
         .eq("id", data.user.id)
         .single();
 
+      const resolvedRole =
+        profile?.role ??
+        (data.user.user_metadata?.role as string | undefined) ??
+        "student";
+
       const next = params.get("next");
       let destination: string;
       if (next && next !== "/login") {
         destination = next;
       } else {
-        destination = profile?.role === "teacher" ? "/teacher/dashboard" : "/student/dashboard";
+        destination = resolvedRole === "teacher" ? "/teacher/dashboard" : "/student/dashboard";
       }
       // Hard redirect so the browser sends the new auth cookies on the
       // first request and the middleware sees the authenticated user.
