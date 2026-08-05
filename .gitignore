@@ -30,6 +30,9 @@ yarn-error.log*
 .env.local
 .env.production
 
+# scratch/dev utility scripts
+scratch-*.ts
+
 # vercel
 .vercel
 
