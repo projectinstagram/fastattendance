@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase/client";
 
@@ -17,7 +17,6 @@ export default function LoginPage() {
 }
 
 function LoginForm() {
-  const router = useRouter();
   const params = useSearchParams();
   const [mode, setMode] = useState<Mode>("signin");
   const [role, setRole] = useState<Role>("student");
@@ -65,12 +64,15 @@ function LoginForm() {
         .single();
 
       const next = params.get("next");
+      let destination: string;
       if (next && next !== "/login") {
-        router.push(next);
+        destination = next;
       } else {
-        router.push(profile?.role === "teacher" ? "/teacher/dashboard" : "/student/dashboard");
+        destination = profile?.role === "teacher" ? "/teacher/dashboard" : "/student/dashboard";
       }
-      router.refresh();
+      // Hard redirect so the browser sends the new auth cookies on the
+      // first request and the middleware sees the authenticated user.
+      window.location.href = destination;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
