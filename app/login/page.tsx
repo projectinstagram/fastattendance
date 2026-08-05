@@ -30,6 +30,19 @@ function LoginForm() {
   const [semester, setSemester] = useState("1");
   const [section, setSection] = useState("A");
 
+  async function persistSession(session: { access_token: string; refresh_token: string }) {
+    const response = await fetch("/api/auth/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(session),
+    });
+
+    if (!response.ok) {
+      const body = await response.json().catch(() => null);
+      throw new Error(body?.error ?? "Could not save your sign-in session.");
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -50,8 +63,9 @@ function LoginForm() {
         if (error) throw error;
 
         // If email confirmation is disabled in Supabase, the user is already
-        // logged in after signUp — redirect them immediately.
+        // logged in after signUp Ã¢â‚¬â€ redirect them immediately.
         if (signUpData.session) {
+          await persistSession(signUpData.session);
           const destination = role === "teacher" ? "/teacher/dashboard" : "/student/dashboard";
           window.location.href = destination;
           return;
@@ -65,6 +79,9 @@ function LoginForm() {
 
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      if (!data.session) throw new Error("No session was returned. Please try signing in again.");
+
+      await persistSession(data.session);
 
       // Try to get role from the profiles table; fall back to auth metadata
       // if the profile row hasn't been created yet (e.g. trigger delay).
@@ -112,7 +129,7 @@ function LoginForm() {
           </h1>
           <p className="mt-6 text-sm leading-relaxed text-paper/70">
             Every attendance record is traced back to the authenticated student who holds the
-            roll number — never to whatever a browser form happens to submit.
+            roll number Ã¢â‚¬â€ never to whatever a browser form happens to submit.
           </p>
         </div>
         <div className="relative font-mono text-xs text-paper/40">College Attendance System</div>
@@ -181,7 +198,7 @@ function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="input"
-                placeholder="••••••••"
+                placeholder="Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢Ã¢â‚¬Â¢"
               />
             </Field>
 
@@ -239,7 +256,7 @@ function LoginForm() {
               disabled={loading}
               className="mt-2 w-full rounded-sm bg-ink-950 py-2.5 text-sm font-medium text-paper transition hover:bg-ink-800 disabled:opacity-60"
             >
-              {loading ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+              {loading ? "Please waitÃ¢â‚¬Â¦" : mode === "signin" ? "Sign in" : "Create account"}
             </button>
           </form>
 
