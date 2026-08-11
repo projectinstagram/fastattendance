@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase/client";
@@ -34,6 +34,8 @@ export default function TeacherSessionPage() {
   const [confirmEndOpen, setConfirmEndOpen] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
+  const rotateWarnedRef = useRef(false);
+  const rotateRetryRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const loadAll = useCallback(async () => {
     const { data: s } = await supabase.from("attendance_sessions").select("*").eq("id", sessionId).single();
@@ -66,20 +68,53 @@ export default function TeacherSessionPage() {
   }, [sessionId, supabase]);
 
   const rotate = useCallback(async () => {
-    const res = await fetch("/api/attendance/qr-rotate", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ sessionId }),
-    });
-    const data = await res.json();
-    if (res.ok) {
+    if (rotateRetryRef.current) {
+      clearTimeout(rotateRetryRef.current);
+      rotateRetryRef.current = null;
+    }
+
+    try {
+      const res = await fetch("/api/attendance/qr-rotate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ sessionId }),
+      });
+
+      // Terminal states — don't keep retrying forever.
+      if (res.status === 401) {
+        toast.error("Your session expired. Please refresh the page and sign in again.");
+        return;
+      }
+      if (res.status === 409) {
+        return; // session was ended elsewhere; nothing left to rotate.
+      }
+
+      if (!res.ok) throw new Error(`qr-rotate failed with ${res.status}`);
+      const data = await res.json();
+
       setQrToken(data.qrToken);
       setQrExpiresAt(data.qrExpiresAt);
       if (data.sessionCode) {
         setSession((prev) => (prev ? { ...prev, session_code: data.sessionCode } : null));
       }
+      rotateWarnedRef.current = false;
+    } catch {
+      // Transient failure (network blip, brief server hiccup, etc.) — the
+      // QR would otherwise freeze on an already-expired code forever, so
+      // keep retrying instead of giving up after one failed attempt.
+      if (!rotateWarnedRef.current) {
+        rotateWarnedRef.current = true;
+        toast.error("Couldn't refresh the QR code — retrying…");
+      }
+      rotateRetryRef.current = setTimeout(rotate, 3000);
     }
   }, [sessionId]);
+
+  useEffect(() => {
+    return () => {
+      if (rotateRetryRef.current) clearTimeout(rotateRetryRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     loadAll().then(() => rotate());

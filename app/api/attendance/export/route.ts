@@ -1,12 +1,14 @@
 import { NextResponse } from "next/server";
 import ExcelJS from "exceljs";
 import { createClient } from "@/lib/supabase/server";
-import { requireTeacher } from "@/lib/auth";
+import { requireTeacherApi } from "@/lib/auth";
 import { buildRoster } from "@/lib/attendance";
 import type { AttendanceRecord } from "@/types/database";
 
 export async function GET(request: Request) {
-  const { teacher } = await requireTeacher();
+  const auth = await requireTeacherApi();
+  if (auth instanceof NextResponse) return auth;
+  const { teacher } = auth;
   const { searchParams } = new URL(request.url);
   const sessionId = searchParams.get("session");
 

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { requireStudent } from "@/lib/auth";
+import { requireStudentApi } from "@/lib/auth";
 import { resolveSessionByCode, resolveSessionByToken } from "@/lib/attendance-session";
 import { haversineMeters } from "@/lib/attendance";
 import { logSecurityEvent } from "@/lib/security";
@@ -11,7 +11,9 @@ export async function POST(request: Request) {
   // all satisfied by requireStudent(), which derives identity purely from
   // the Supabase session cookie. `student.roll_number` below is the ONLY
   // roll number this endpoint will ever use.
-  const { student } = await requireStudent();
+  const auth = await requireStudentApi();
+  if (auth instanceof NextResponse) return auth;
+  const { student } = auth;
   const body = await request.json().catch(() => ({}));
   const { sessionId, token, code, latitude, longitude, deviceId } = body ?? {};
 

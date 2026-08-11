@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { requireTeacher } from "@/lib/auth";
+import { requireTeacherApi } from "@/lib/auth";
 import { generateQrToken, generateSessionCode, hashQrToken } from "@/lib/attendance";
 
 export async function POST(request: Request) {
-  const { teacher } = await requireTeacher();
+  const auth = await requireTeacherApi();
+  if (auth instanceof NextResponse) return auth;
+  const { teacher } = auth;
   const body = await request.json().catch(() => ({}));
 
   const {

@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { requireTeacher } from "@/lib/auth";
+import { requireTeacherApi } from "@/lib/auth";
 
 export async function POST(request: Request) {
-  const { teacher } = await requireTeacher();
+  const auth = await requireTeacherApi();
+  if (auth instanceof NextResponse) return auth;
+  const { teacher } = auth;
   const { sessionId } = await request.json().catch(() => ({}));
 
   if (!sessionId) {
