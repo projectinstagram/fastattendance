@@ -9,6 +9,7 @@ export default function StatCard({
   compact,
   icon,
   barColor,
+  labelColor = "text-ink-700/60",
 }: {
   label: string;
   value: string | number;
@@ -17,6 +18,9 @@ export default function StatCard({
   compact?: boolean;
   icon?: ReactNode;
   barColor?: string;
+  /** Compact mode's label color — override for use on a dark background
+   * (e.g. the fullscreen QR view), where the default reads as invisible. */
+  labelColor?: string;
 }) {
   const valueClass = color ?? (accent ? "text-brass-600" : "text-ink-950");
 
@@ -24,7 +28,7 @@ export default function StatCard({
     return (
       <div className="text-center">
         <div className={`font-display text-xl font-semibold ${valueClass}`}>{value}</div>
-        <div className="text-[10px] uppercase tracking-wide text-ink-700/60">{label}</div>
+        <div className={`text-[10px] uppercase tracking-wide ${labelColor}`}>{label}</div>
       </div>
     );
   }

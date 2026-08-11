@@ -193,15 +193,103 @@ export default function TeacherSessionPage() {
 
   const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
 
-  return (
-    <div className={fullscreen ? "fixed inset-0 z-50 overflow-y-auto bg-ink-950" : "min-h-screen"}>
-      <div className={`mx-auto max-w-6xl px-6 py-8 ${fullscreen ? "text-paper" : ""}`}>
-        <div className="flex flex-wrap items-start justify-between gap-4">
+  const confirmDialog = (
+    <ConfirmDialog
+      open={confirmEndOpen}
+      title="End this attendance session?"
+      description="Students will no longer be able to submit attendance once this session is closed."
+      confirmLabel={ending ? "Ending…" : "End Session"}
+      variant="danger"
+      loading={ending}
+      onConfirm={endSession}
+      onClose={() => setConfirmEndOpen(false)}
+    />
+  );
+
+  // Dedicated layout, not a variant of the normal two-column page — this is
+  // meant to be projected for the whole room to scan from, so the QR needs
+  // to be large and centered rather than reusing the small sidebar card.
+  if (fullscreen) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col overflow-y-auto bg-ink-950 text-paper">
+        <div className="flex flex-wrap items-start justify-between gap-4 px-8 py-6">
           <div>
-            <div className={`text-xs uppercase tracking-wide ${fullscreen ? "text-paper/50" : "text-ink-700/60"}`}>
+            <div className="text-xs uppercase tracking-wide text-paper/50">
               {classRow.department} · Sem {classRow.semester} · Sec {classRow.section}
             </div>
-            <h1 className={`font-display text-3xl font-semibold ${fullscreen ? "text-paper" : "text-ink-950"}`}>
+            <h1 className="font-display text-2xl font-semibold text-paper">
+              {classRow.name} — {classRow.subject}
+            </h1>
+            <div className="mt-1 flex items-center gap-2 text-sm">
+              {session.is_active ? (
+                <span className="flex items-center gap-1.5 text-signal-present">
+                  <span className="qr-live-dot h-1.5 w-1.5 rounded-full bg-signal-present" />
+                  Attendance Live · closes in {formatCountdown(endLeft)}
+                </span>
+              ) : (
+                <span className="text-paper/50">Session ended</span>
+              )}
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button variant="ghostDark" size="sm" onClick={() => setFullscreen(false)}>
+              Exit fullscreen
+            </Button>
+            <Button variant="ghostDark" size="sm" onClick={exportExcel}>
+              Export Excel
+            </Button>
+            {session.is_active && (
+              <Button variant="danger" size="sm" onClick={() => setConfirmEndOpen(true)} loading={ending}>
+                {ending ? "Ending…" : "End Session"}
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div className="flex flex-1 flex-col items-center justify-center gap-8 px-8 pb-16">
+          {session.is_active && qrToken && qrExpiresAt ? (
+            <QRDisplay
+              sessionId={sessionId}
+              qrToken={qrToken}
+              qrExpiresAt={qrExpiresAt}
+              sessionCode={session.session_code}
+              refreshSeconds={session.qr_refresh_seconds}
+              onRotate={rotate}
+              siteUrl={siteUrl}
+              large
+            />
+          ) : (
+            <p className="text-center text-lg text-paper/60">QR code retired — session is closed.</p>
+          )}
+
+          <div className="grid w-full max-w-md grid-cols-3 gap-6">
+            <StatCard compact label="Present" value={present} color="text-signal-present" labelColor="text-paper/50" />
+            <StatCard compact label="Late" value={late} color="text-signal-late" labelColor="text-paper/50" />
+            <StatCard compact label="Absent" value={absent} color="text-signal-absent" labelColor="text-paper/50" />
+          </div>
+
+          {securityAlerts > 0 && (
+            <div className="rounded-lg bg-signal-absent/10 px-4 py-2 text-sm text-signal-absent">
+              ⚠ {securityAlerts} suspicious attendance {securityAlerts === 1 ? "attempt" : "attempts"}
+            </div>
+          )}
+        </div>
+
+        {confirmDialog}
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen">
+      <div className="mx-auto max-w-6xl px-6 py-8">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="text-xs uppercase tracking-wide text-ink-700/60">
+              {classRow.department} · Sem {classRow.semester} · Sec {classRow.section}
+            </div>
+            <h1 className="font-display text-3xl font-semibold text-ink-950">
               {classRow.name} — {classRow.subject}
             </h1>
             <div className="mt-1 flex items-center gap-2 text-sm">
@@ -217,16 +305,9 @@ export default function TeacherSessionPage() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {!fullscreen && (
-              <Button variant="secondary" size="sm" onClick={() => setFullscreen(true)}>
-                Fullscreen QR
-              </Button>
-            )}
-            {fullscreen && (
-              <Button variant="ghostDark" size="sm" onClick={() => setFullscreen(false)}>
-                Exit fullscreen
-              </Button>
-            )}
+            <Button variant="secondary" size="sm" onClick={() => setFullscreen(true)}>
+              Fullscreen QR
+            </Button>
             <Button variant="secondary" size="sm" onClick={exportExcel}>
               Export Excel
             </Button>
@@ -235,11 +316,9 @@ export default function TeacherSessionPage() {
                 {ending ? "Ending…" : "End Session"}
               </Button>
             )}
-            {!fullscreen && (
-              <Button variant="secondary" size="sm" onClick={() => router.push("/teacher/dashboard")}>
-                Back
-              </Button>
-            )}
+            <Button variant="secondary" size="sm" onClick={() => router.push("/teacher/dashboard")}>
+              Back
+            </Button>
           </div>
         </div>
 
@@ -272,24 +351,13 @@ export default function TeacherSessionPage() {
             )}
           </div>
 
-          {!fullscreen && (
-            <div>
-              <AttendanceTable rows={rows} />
-            </div>
-          )}
+          <div>
+            <AttendanceTable rows={rows} />
+          </div>
         </div>
       </div>
 
-      <ConfirmDialog
-        open={confirmEndOpen}
-        title="End this attendance session?"
-        description="Students will no longer be able to submit attendance once this session is closed."
-        confirmLabel={ending ? "Ending…" : "End Session"}
-        variant="danger"
-        loading={ending}
-        onConfirm={endSession}
-        onClose={() => setConfirmEndOpen(false)}
-      />
+      {confirmDialog}
     </div>
   );
 }
