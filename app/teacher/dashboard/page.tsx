@@ -127,16 +127,24 @@ export default async function TeacherDashboardPage() {
           </div>
           <div className="grid gap-3 md:grid-cols-2">
             {(classes ?? []).map((c) => (
-              <Card key={c.id} className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brass-400/15 text-brass-600">
-                  <BookIcon className="h-4 w-4" />
-                </span>
-                <div>
-                  <div className="font-medium text-ink-950">{c.name}</div>
-                  <div className="text-xs text-ink-700">
-                    {c.subject} · {c.department} Sem {c.semester} · Sec {c.section}
+              <Card key={c.id} className="flex items-start justify-between gap-3">
+                <div className="flex items-start gap-3">
+                  <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brass-400/15 text-brass-600">
+                    <BookIcon className="h-4 w-4" />
+                  </span>
+                  <div>
+                    <div className="font-medium text-ink-950">{c.name}</div>
+                    <div className="text-xs text-ink-700">
+                      {c.subject} · {c.department} Sem {c.semester} · Sec {c.section}
+                    </div>
                   </div>
                 </div>
+                <Link
+                  href={`/teacher/classes/${c.id}/roster`}
+                  className="shrink-0 text-xs text-brass-600 underline underline-offset-4"
+                >
+                  Roster
+                </Link>
               </Card>
             ))}
             {(!classes || classes.length === 0) && (

@@ -30,12 +30,17 @@ export async function POST(request: Request) {
   }
 
   // Check 4 & 5: session active, QR/code valid and not expired.
-  const resolution =
-    code && !sessionId
-      ? await resolveSessionByCode(code)
-      : sessionId && token
-      ? await resolveSessionByToken(sessionId, token)
-      : null;
+  // Prefer `code` when present: the client (JoinConfirm.tsx) always sends
+  // sessionId once a join link has resolved, even for a manual-code join,
+  // so gating this on "!sessionId" (as an earlier version of this route
+  // did) meant the code branch could never be reached — every manual-code
+  // submission fell through to the token branch and failed with "A
+  // session token or code is required," even though the code was right.
+  const resolution = code
+    ? await resolveSessionByCode(code)
+    : sessionId && token
+    ? await resolveSessionByToken(sessionId, token)
+    : null;
 
   if (!resolution) {
     return NextResponse.json({ error: "A session token or code is required." }, { status: 400 });

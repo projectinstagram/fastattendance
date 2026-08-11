@@ -35,18 +35,22 @@ export default function NewClassPage() {
 
       // created_at is set automatically by the database (default now()) —
       // there's no date field to fill in here.
-      const { error } = await supabase.from("classes").insert({
-        name,
-        subject,
-        department,
-        semester,
-        section,
-        teacher_id: teacherRow.id,
-      });
+      const { data: newClass, error } = await supabase
+        .from("classes")
+        .insert({
+          name,
+          subject,
+          department,
+          semester,
+          section,
+          teacher_id: teacherRow.id,
+        })
+        .select("id")
+        .single();
       if (error) throw error;
 
-      toast.success("Class added.");
-      router.push("/teacher/dashboard");
+      toast.success("Class added — now add students to its roster.");
+      router.push(`/teacher/classes/${newClass.id}/roster`);
       router.refresh();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not add class.");
