@@ -88,9 +88,9 @@ function LoginForm() {
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            "radial-gradient(1100px circle at 18% -10%, rgba(201,162,39,0.09), transparent 55%)," +
-            "radial-gradient(900px circle at 88% 110%, rgba(143,163,184,0.08), transparent 50%)," +
-            "linear-gradient(180deg, #050608 0%, #0a0d12 100%)",
+            "radial-gradient(1100px circle at 18% -10%, rgba(0,255,102,0.07), transparent 55%)," +
+            "radial-gradient(900px circle at 88% 110%, rgba(0,255,102,0.05), transparent 50%)," +
+            "linear-gradient(180deg, #0D1117 0%, #1A1F2B 100%)",
         }}
       />
       <WebBackground />
@@ -99,8 +99,8 @@ function LoginForm() {
       <div className="relative z-20 flex min-h-screen items-center justify-center px-6 py-16">
         <div style={{ perspective: "1200px" }}>
           <TiltCard className="relative w-[min(24rem,88vw)] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.045] p-8 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.65)] backdrop-blur-xl">
-            <div className="flex items-center gap-2 text-brass-400">
-              <span className="qr-live-dot h-1.5 w-1.5 rounded-full bg-brass-400" />
+            <div className="flex items-center gap-2 text-neon">
+              <span className="qr-live-dot h-1.5 w-1.5 rounded-full bg-neon" />
               <span className="font-mono text-[11px] uppercase tracking-[0.22em]">Attendance Live</span>
             </div>
 

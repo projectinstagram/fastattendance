@@ -140,7 +140,7 @@ const SpiderCanvas = forwardRef<SpiderCanvasHandle>(function SpiderCanvas(_props
     }
 
     function drawSpider(x: number, y: number, angle: number, legPhase: number) {
-      const scale = 1;
+      const scale = 1.9;
       ctx!.save();
       ctx!.translate(x, y);
 
@@ -151,6 +151,16 @@ const SpiderCanvas = forwardRef<SpiderCanvasHandle>(function SpiderCanvas(_props
       ctx!.fillStyle = "rgba(0,0,0,0.35)";
       ctx!.beginPath();
       ctx!.ellipse(0, 0, 11 * scale, 4 * scale, 0, 0, Math.PI * 2);
+      ctx!.fill();
+      ctx!.restore();
+
+      // Faint neon ground glow so the spider reads clearly against the
+      // dark background without looking like a floating cutout.
+      ctx!.save();
+      ctx!.filter = "blur(7px)";
+      ctx!.fillStyle = "rgba(0,255,102,0.22)";
+      ctx!.beginPath();
+      ctx!.ellipse(0, 0, 15 * scale, 11 * scale, 0, 0, Math.PI * 2);
       ctx!.fill();
       ctx!.restore();
 
@@ -170,8 +180,8 @@ const SpiderCanvas = forwardRef<SpiderCanvasHandle>(function SpiderCanvas(_props
         const footX = kneeX + Math.cos(hipAngle - side * 0.3) * 6 * scale;
         const footY = kneeY + side * 5 * scale;
 
-        ctx!.strokeStyle = "rgba(15,17,22,0.82)";
-        ctx!.lineWidth = 1.3;
+        ctx!.strokeStyle = "rgba(40,46,56,0.95)";
+        ctx!.lineWidth = 1.6;
         ctx!.lineCap = "round";
         ctx!.beginPath();
         ctx!.moveTo(hipX, hipY);
@@ -188,14 +198,14 @@ const SpiderCanvas = forwardRef<SpiderCanvasHandle>(function SpiderCanvas(_props
       ctx!.ellipse(4 * scale, 0, 4.2 * scale, 3.4 * scale, 0, 0, Math.PI * 2);
       ctx!.fill();
 
-      ctx!.strokeStyle = "rgba(201,162,39,0.28)";
-      ctx!.lineWidth = 0.8;
+      ctx!.strokeStyle = "rgba(0,255,102,0.55)";
+      ctx!.lineWidth = 0.9;
       ctx!.beginPath();
       ctx!.ellipse(-7 * scale, -0.5, 6.5 * scale, 5 * scale, 0, Math.PI, Math.PI * 1.6);
       ctx!.stroke();
 
       // Eyes — two small highlights, subtle rather than cartoonish.
-      ctx!.fillStyle = "rgba(185,198,212,0.55)";
+      ctx!.fillStyle = "rgba(0,255,102,0.75)";
       ctx!.beginPath();
       ctx!.arc(7 * scale, -1.2 * scale, 0.55, 0, Math.PI * 2);
       ctx!.arc(7 * scale, 1.2 * scale, 0.55, 0, Math.PI * 2);
@@ -212,7 +222,9 @@ const SpiderCanvas = forwardRef<SpiderCanvasHandle>(function SpiderCanvas(_props
         { x: rect.left, y: rect.bottom },
       ];
       ctx!.save();
-      ctx!.strokeStyle = `rgba(201,162,39,${0.55 * progress})`;
+      ctx!.strokeStyle = `rgba(0,255,102,${0.6 * progress})`;
+      ctx!.shadowColor = "rgba(0,255,102,0.8)";
+      ctx!.shadowBlur = 4 * progress;
       ctx!.lineWidth = 0.8;
       for (const c of corners) {
         const tx = lerp(spider.x, c.x, Math.min(1, progress * 1.4));
@@ -265,7 +277,12 @@ const SpiderCanvas = forwardRef<SpiderCanvasHandle>(function SpiderCanvas(_props
       const speed = Math.min(1, dist / 200);
       legPhaseRef.current += 0.12 + speed * 0.35;
 
-      ctx!.clearRect(0, 0, width, height);
+      // Clear using the canvas's actual device-pixel buffer size (width/height
+      // times devicePixelRatio) — clearing with CSS-pixel dimensions here,
+      // before the dpr scale below is applied, only wipes a fraction of the
+      // real buffer on any display with dpr > 1, leaving old frames smeared
+      // across the rest of the canvas.
+      ctx!.clearRect(0, 0, canvas!.width, canvas!.height);
       ctx!.save();
       ctx!.scale(dpr, dpr);
 

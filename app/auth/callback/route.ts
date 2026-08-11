@@ -1,4 +1,5 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 const ALLOWED_EMAIL_DOMAIN = "kiit.ac.in";
@@ -13,15 +14,24 @@ export async function GET(request: Request) {
     return NextResponse.redirect(new URL("/login?error=missing_code", url.origin));
   }
 
+  const cookieStore = cookies();
   const cookiesToSet: { name: string; value: string; options: CookieOptions }[] = [];
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
+        // Read the incoming request's cookies — exchangeCodeForSession needs
+        // the PKCE code_verifier cookie that signInWithOAuth set in the
+        // browser before redirecting to Google. Returning [] here (as an
+        // earlier version of this file did) means that cookie is never
+        // found, so the exchange always fails with "auth_failed".
         getAll() {
-          return [];
+          return cookieStore.getAll();
         },
+        // Collected separately (rather than written straight to the
+        // request-scoped cookie store) so they can be attached to the
+        // specific NextResponse.redirect returned below.
         setAll(cookies) {
           cookiesToSet.push(...cookies);
         },

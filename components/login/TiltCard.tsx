@@ -52,7 +52,7 @@ export default function TiltCard({ children, className = "" }: { children: React
           className="pointer-events-none absolute inset-0 rounded-2xl"
           style={{
             background:
-              "radial-gradient(480px circle at var(--glow-x, 50%) var(--glow-y, 50%), rgba(201,162,39,0.10), transparent 60%)",
+              "radial-gradient(480px circle at var(--glow-x, 50%) var(--glow-y, 50%), rgba(0,255,102,0.08), transparent 60%)",
           }}
         />
       )}

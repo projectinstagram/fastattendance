@@ -26,15 +26,19 @@ const config: Config = {
         // elsewhere in the app, so the light "ink/paper/brass" system
         // used everywhere else is unaffected.
         void: {
-          950: "#050608",
-          900: "#0A0D12",
-          800: "#11151D",
-          700: "#1A2028",
-          600: "#252C37",
+          950: "#0D1117",
+          900: "#1A1F2B",
+          800: "#2A2F3A",
+          700: "#374050",
+          600: "#454F63",
         },
         web: {
           400: "#8FA3B8",
           300: "#B9C6D4",
+        },
+        neon: {
+          DEFAULT: "#00FF66",
+          dim: "#00CC52",
         },
       },
       fontFamily: {
@@ -54,10 +58,31 @@ const config: Config = {
           "0%": { opacity: "0", transform: "scale(0.96)" },
           "100%": { opacity: "1", transform: "scale(1)" },
         },
+        "portal-spin": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "portal-spin-reverse": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(-360deg)" },
+        },
+        "portal-in": {
+          "0%": { opacity: "0", transform: "scale(0.7)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
+        "g-pop": {
+          "0%": { opacity: "0", transform: "scale(0.4)" },
+          "60%": { opacity: "1", transform: "scale(1.08)" },
+          "100%": { opacity: "1", transform: "scale(1)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.15s ease-out",
         "scale-in": "scale-in 0.15s ease-out",
+        "portal-spin": "portal-spin 1.6s linear infinite",
+        "portal-spin-reverse": "portal-spin-reverse 2.2s linear infinite",
+        "portal-in": "portal-in 0.25s cubic-bezier(0.22,1,0.36,1)",
+        "g-pop": "g-pop 0.4s cubic-bezier(0.22,1,0.36,1) 0.1s both",
       },
     },
   },
