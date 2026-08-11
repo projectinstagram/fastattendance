@@ -5,6 +5,7 @@ import Link from "next/link";
 import type { AttendanceSession, ClassRow } from "@/types/database";
 import Button from "@/components/ui/Button";
 import { SURFACE_CLASS } from "@/components/ui/Card";
+import { getDeviceId } from "@/lib/deviceId";
 
 type Result =
   | { state: "idle" }
@@ -55,7 +56,7 @@ export default function JoinConfirm({
       const res = await fetch("/api/attendance/mark", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ sessionId: session.id, token, code, latitude, longitude }),
+        body: JSON.stringify({ sessionId: session.id, token, code, latitude, longitude, deviceId: getDeviceId() }),
       });
       const data = await res.json();
 

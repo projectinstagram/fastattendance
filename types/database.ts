@@ -7,7 +7,8 @@ export type SecurityEventType =
   | "DUPLICATE_ATTENDANCE"
   | "UNAUTHORIZED_ATTENDANCE"
   | "LOCATION_OUT_OF_RANGE"
-  | "WRONG_CLASS";
+  | "WRONG_CLASS"
+  | "DEVICE_MISMATCH";
 
 export interface Profile {
   id: string;
@@ -91,6 +92,13 @@ export interface SecurityEvent {
   created_at: string;
 }
 
+export interface DeviceBinding {
+  device_id: string;
+  student_id: string;
+  first_seen_at: string;
+  last_seen_at: string;
+}
+
 /** Postgrest-js requires every table to declare its Row/Insert/Update/Relationships shape explicitly. */
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
@@ -110,6 +118,7 @@ export interface Database {
       attendance_sessions: Table<AttendanceSession>;
       attendance_records: Table<AttendanceRecord>;
       security_events: Table<SecurityEvent>;
+      device_bindings: Table<DeviceBinding>;
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

@@ -119,7 +119,12 @@ export default async function TeacherDashboardPage() {
         )}
 
         <section className="mt-10">
-          <h2 className="mb-3 font-display text-lg font-semibold text-ink-950">Classes</h2>
+          <div className="mb-3 flex items-center justify-between">
+            <h2 className="font-display text-lg font-semibold text-ink-950">Classes</h2>
+            <Button href="/teacher/classes/new" variant="secondary" size="sm">
+              + Add Class
+            </Button>
+          </div>
           <div className="grid gap-3 md:grid-cols-2">
             {(classes ?? []).map((c) => (
               <Card key={c.id} className="flex items-start gap-3">
@@ -138,7 +143,12 @@ export default async function TeacherDashboardPage() {
               <EmptyState
                 className="md:col-span-2"
                 icon={<BookIcon />}
-                message="No classes yet. Add one from Supabase or your admin tooling to get started."
+                message="No classes yet."
+                action={
+                  <Button href="/teacher/classes/new" size="sm">
+                    + Add Class
+                  </Button>
+                }
               />
             )}
           </div>
@@ -163,6 +173,12 @@ export default async function TeacherDashboardPage() {
                       {new Date(s.start_time).toLocaleDateString()} {new Date(s.start_time).toLocaleTimeString()}
                     </td>
                     <td className="px-4 py-2.5 text-right">
+                      <a
+                        href={`/api/attendance/export?session=${s.id}`}
+                        className="mr-4 text-xs text-ink-700 underline underline-offset-4 hover:text-ink-950"
+                      >
+                        Export
+                      </a>
                       <Link href={`/teacher/session/${s.id}`} className="text-xs text-brass-600 underline underline-offset-4">
                         View
                       </Link>

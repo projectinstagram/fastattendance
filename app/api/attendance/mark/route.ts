@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { requireStudent } from "@/lib/auth";
 import { resolveSessionByCode, resolveSessionByToken } from "@/lib/attendance-session";
 import { haversineMeters } from "@/lib/attendance";
@@ -12,7 +13,7 @@ export async function POST(request: Request) {
   // roll number this endpoint will ever use.
   const { student } = await requireStudent();
   const body = await request.json().catch(() => ({}));
-  const { sessionId, token, code, latitude, longitude } = body ?? {};
+  const { sessionId, token, code, latitude, longitude, deviceId } = body ?? {};
 
   // Defense-in-depth: if a tampered client tries to smuggle identity fields
   // into the request, record it — they are never read for anything below.
@@ -77,6 +78,42 @@ export async function POST(request: Request) {
       { error: "You are not enrolled in this class, so attendance cannot be recorded." },
       { status: 403 }
     );
+  }
+
+  // Check 9: this device hasn't already marked attendance for a different
+  // student. Best-effort — deviceId is a browser-persisted random id, not a
+  // hardware fingerprint, so it's skipped (fail open) if the client didn't
+  // send one rather than blocking a legitimate submission over it.
+  if (typeof deviceId === "string" && deviceId.length > 0) {
+    const admin = createAdminClient();
+    const { data: binding } = await admin
+      .from("device_bindings")
+      .select("student_id")
+      .eq("device_id", deviceId)
+      .maybeSingle();
+
+    if (binding && binding.student_id !== student.id) {
+      await logSecurityEvent({
+        studentId: student.id,
+        sessionId: session.id,
+        eventType: "DEVICE_MISMATCH",
+        details: `Attendance blocked: device ${deviceId} is already bound to a different student.`,
+        request,
+      });
+      return NextResponse.json(
+        {
+          error:
+            "This device is already linked to another student's account. Each device can only mark attendance for one student — ask your teacher if you think this is a mistake.",
+        },
+        { status: 403 }
+      );
+    }
+
+    if (!binding) {
+      await admin.from("device_bindings").insert({ device_id: deviceId, student_id: student.id });
+    } else {
+      await admin.from("device_bindings").update({ last_seen_at: new Date().toISOString() }).eq("device_id", deviceId);
+    }
   }
 
   // Check 6: not already marked for this session.
