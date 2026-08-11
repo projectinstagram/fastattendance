@@ -2,6 +2,10 @@ import Link from "next/link";
 import { requireTeacher } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import StatCard from "@/components/ui/StatCard";
+import EmptyState from "@/components/ui/EmptyState";
 
 export const dynamic = "force-dynamic";
 
@@ -57,12 +61,7 @@ export default async function TeacherDashboardPage() {
             <h1 className="font-display text-3xl font-semibold text-ink-950">Welcome, {profile.name}</h1>
             <p className="mt-1 text-sm text-ink-700">{classes?.length ?? 0} classes under your account.</p>
           </div>
-          <Link
-            href="/teacher/start"
-            className="rounded-sm bg-ink-950 px-5 py-2.5 text-sm font-medium text-paper transition hover:bg-ink-800"
-          >
-            Start Attendance
-          </Link>
+          <Button href="/teacher/start">Start Attendance</Button>
         </div>
 
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -100,17 +99,18 @@ export default async function TeacherDashboardPage() {
           <h2 className="mb-3 font-display text-lg font-semibold text-ink-950">Classes</h2>
           <div className="grid gap-3 md:grid-cols-2">
             {(classes ?? []).map((c) => (
-              <div key={c.id} className="rounded-sm border border-ink-900/10 bg-white px-5 py-4">
+              <Card key={c.id}>
                 <div className="font-medium text-ink-950">{c.name}</div>
                 <div className="text-xs text-ink-700">
                   {c.subject} · {c.department} Sem {c.semester} · Sec {c.section}
                 </div>
-              </div>
+              </Card>
             ))}
             {(!classes || classes.length === 0) && (
-              <p className="text-sm text-ink-700/70">
-                No classes yet. Add one from Supabase or your admin tooling to get started.
-              </p>
+              <EmptyState
+                className="md:col-span-2"
+                message="No classes yet. Add one from Supabase or your admin tooling to get started."
+              />
             )}
           </div>
         </section>
@@ -128,7 +128,7 @@ export default async function TeacherDashboardPage() {
               </thead>
               <tbody>
                 {previous.map((s) => (
-                  <tr key={s.id} className="border-b border-ink-900/5 last:border-0">
+                  <tr key={s.id} className="border-b border-ink-900/5 transition hover:bg-ink-900/[0.02] last:border-0">
                     <td className="px-4 py-2.5 text-ink-950">{(s as any).classes?.name}</td>
                     <td className="px-4 py-2.5 text-ink-700">
                       {new Date(s.start_time).toLocaleDateString()} {new Date(s.start_time).toLocaleTimeString()}
@@ -152,17 +152,6 @@ export default async function TeacherDashboardPage() {
           </div>
         </section>
       </main>
-    </div>
-  );
-}
-
-function StatCard({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
-  return (
-    <div className="rounded-sm border border-ink-900/10 bg-white px-5 py-4">
-      <div className="text-xs uppercase tracking-wide text-ink-700/60">{label}</div>
-      <div className={`mt-1 font-display text-2xl font-semibold ${accent ? "text-brass-600" : "text-ink-950"}`}>
-        {value}
-      </div>
     </div>
   );
 }

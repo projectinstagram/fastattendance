@@ -59,7 +59,7 @@ export default function AttendanceTable({ rows }: { rows: RosterRow[] }) {
           </thead>
           <tbody>
             {filtered.map((r) => (
-              <tr key={r.roll_number} className="border-b border-ink-900/5 last:border-0">
+              <tr key={r.roll_number} className="border-b border-ink-900/5 transition hover:bg-ink-900/[0.02] last:border-0">
                 <td className="roll-badge px-4 py-2.5 font-mono text-ink-950">{r.roll_number}</td>
                 <td className="px-4 py-2.5 text-ink-900">{r.name}</td>
                 <td className="px-4 py-2.5 text-ink-700">

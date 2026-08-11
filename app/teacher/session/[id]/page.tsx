@@ -6,6 +6,10 @@ import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase/client";
 import QRDisplay from "@/components/QRDisplay";
 import AttendanceTable from "@/components/AttendanceTable";
+import Button from "@/components/ui/Button";
+import StatCard from "@/components/ui/StatCard";
+import ConfirmDialog from "@/components/ui/ConfirmDialog";
+import { Skeleton, SkeletonTable } from "@/components/ui/Skeleton";
 import { buildRoster, secondsUntil, formatCountdown, type RosterRow } from "@/lib/attendance";
 import type { AttendanceRecord, AttendanceSession, ClassRow } from "@/types/database";
 
@@ -26,6 +30,7 @@ export default function TeacherSessionPage() {
   const [fullscreen, setFullscreen] = useState(false);
   const [endLeft, setEndLeft] = useState(0);
   const [ending, setEnding] = useState(false);
+  const [confirmEndOpen, setConfirmEndOpen] = useState(false);
 
   const supabase = useMemo(() => createClient(), []);
 
@@ -117,7 +122,6 @@ export default function TeacherSessionPage() {
   const absent = rows.length - present - late;
 
   async function endSession() {
-    if (!confirm("End this attendance session? Students will no longer be able to submit.")) return;
     setEnding(true);
     const res = await fetch("/api/attendance/end", {
       method: "POST",
@@ -125,6 +129,7 @@ export default function TeacherSessionPage() {
       body: JSON.stringify({ sessionId }),
     });
     setEnding(false);
+    setConfirmEndOpen(false);
     if (res.ok) {
       toast.success("Session ended.");
       loadAll();
@@ -138,7 +143,16 @@ export default function TeacherSessionPage() {
   }
 
   if (!session || !classRow) {
-    return <div className="p-10 text-sm text-ink-700">Loading session…</div>;
+    return (
+      <div className="mx-auto max-w-6xl px-6 py-8">
+        <Skeleton className="h-8 w-72" />
+        <Skeleton className="mt-3 h-4 w-40" />
+        <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
+          <Skeleton className="h-96 rounded-sm" />
+          <SkeletonTable rows={6} cols={4} />
+        </div>
+      </div>
+    );
   }
 
   const siteUrl = typeof window !== "undefined" ? window.location.origin : "";
@@ -168,27 +182,27 @@ export default function TeacherSessionPage() {
 
           <div className="flex flex-wrap gap-2">
             {!fullscreen && (
-              <button onClick={() => setFullscreen(true)} className="btn-ghost">
+              <Button variant="secondary" size="sm" onClick={() => setFullscreen(true)}>
                 Fullscreen QR
-              </button>
+              </Button>
             )}
             {fullscreen && (
-              <button onClick={() => setFullscreen(false)} className="btn-ghost-dark">
+              <Button variant="ghostDark" size="sm" onClick={() => setFullscreen(false)}>
                 Exit fullscreen
-              </button>
+              </Button>
             )}
-            <button onClick={exportExcel} className="btn-ghost">
+            <Button variant="secondary" size="sm" onClick={exportExcel}>
               Export Excel
-            </button>
+            </Button>
             {session.is_active && (
-              <button onClick={endSession} disabled={ending} className="btn-danger">
+              <Button variant="danger" size="sm" onClick={() => setConfirmEndOpen(true)} loading={ending}>
                 {ending ? "Ending…" : "End Session"}
-              </button>
+              </Button>
             )}
             {!fullscreen && (
-              <button onClick={() => router.push("/teacher/dashboard")} className="btn-ghost">
+              <Button variant="secondary" size="sm" onClick={() => router.push("/teacher/dashboard")}>
                 Back
-              </button>
+              </Button>
             )}
           </div>
         </div>
@@ -209,10 +223,10 @@ export default function TeacherSessionPage() {
               <p className="text-center text-sm text-ink-700/60">QR code retired — session is closed.</p>
             )}
 
-            <div className="grid w-full grid-cols-3 gap-2 text-center">
-              <MiniStat label="Present" value={present} color="text-signal-present" />
-              <MiniStat label="Late" value={late} color="text-signal-late" />
-              <MiniStat label="Absent" value={absent} color="text-signal-absent" />
+            <div className="grid w-full grid-cols-3 gap-2">
+              <StatCard compact label="Present" value={present} color="text-signal-present" />
+              <StatCard compact label="Late" value={late} color="text-signal-late" />
+              <StatCard compact label="Absent" value={absent} color="text-signal-absent" />
             </div>
 
             {securityAlerts > 0 && (
@@ -230,49 +244,16 @@ export default function TeacherSessionPage() {
         </div>
       </div>
 
-      <style jsx global>{`
-        .btn-ghost {
-          border-radius: 3px;
-          border: 1px solid rgba(17, 26, 46, 0.15);
-          background: #fff;
-          padding: 0.5rem 0.9rem;
-          font-size: 0.8rem;
-          font-weight: 500;
-          color: #293654;
-        }
-        .btn-ghost:hover {
-          background: rgba(17, 26, 46, 0.04);
-        }
-        .btn-ghost-dark {
-          border-radius: 3px;
-          border: 1px solid rgba(246, 245, 241, 0.25);
-          background: transparent;
-          padding: 0.5rem 0.9rem;
-          font-size: 0.8rem;
-          font-weight: 500;
-          color: #f6f5f1;
-        }
-        .btn-danger {
-          border-radius: 3px;
-          background: #b0402c;
-          padding: 0.5rem 0.9rem;
-          font-size: 0.8rem;
-          font-weight: 500;
-          color: #f6f5f1;
-        }
-        .btn-danger:hover {
-          background: #963522;
-        }
-      `}</style>
-    </div>
-  );
-}
-
-function MiniStat({ label, value, color }: { label: string; value: number; color: string }) {
-  return (
-    <div>
-      <div className={`font-display text-xl font-semibold ${color}`}>{value}</div>
-      <div className="text-[10px] uppercase tracking-wide text-ink-700/60">{label}</div>
+      <ConfirmDialog
+        open={confirmEndOpen}
+        title="End this attendance session?"
+        description="Students will no longer be able to submit attendance once this session is closed."
+        confirmLabel={ending ? "Ending…" : "End Session"}
+        variant="danger"
+        loading={ending}
+        onConfirm={endSession}
+        onClose={() => setConfirmEndOpen(false)}
+      />
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import type { AttendanceSession, ClassRow } from "@/types/database";
+import Button from "@/components/ui/Button";
 
 type Result =
   | { state: "idle" }
@@ -130,13 +131,9 @@ export default function JoinConfirm({
           <p className="mt-4 rounded-sm bg-signal-absent/10 p-3 text-sm text-signal-absent">{result.message}</p>
         )}
 
-        <button
-          onClick={markAttendance}
-          disabled={loading}
-          className="mt-6 w-full rounded-sm bg-ink-950 py-2.5 text-sm font-medium text-paper transition hover:bg-ink-800 disabled:opacity-60"
-        >
+        <Button onClick={markAttendance} loading={loading} className="mt-6 w-full">
           {loading ? "Marking…" : "Mark Attendance"}
-        </button>
+        </Button>
       </div>
     </div>
   );

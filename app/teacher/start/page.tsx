@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase/client";
 import type { ClassRow } from "@/types/database";
+import Button from "@/components/ui/Button";
 
 export default function StartAttendancePage() {
   const router = useRouter();
@@ -132,13 +133,9 @@ export default function StartAttendancePage() {
           Require classroom location (uses your current location as the anchor)
         </label>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full rounded-sm bg-ink-950 py-2.5 text-sm font-medium text-paper transition hover:bg-ink-800 disabled:opacity-60"
-        >
+        <Button type="submit" loading={loading} className="w-full">
           {loading ? "Starting…" : "Start Attendance"}
-        </button>
+        </Button>
       </form>
 
       <style jsx global>{`

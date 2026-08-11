@@ -1,7 +1,9 @@
-import Link from "next/link";
 import { requireStudent } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
+import Button from "@/components/ui/Button";
+import Card from "@/components/ui/Card";
+import EmptyState from "@/components/ui/EmptyState";
 
 export const dynamic = "force-dynamic";
 
@@ -48,23 +50,20 @@ export default async function StudentDashboardPage() {
           <span>College Email: {profile.email}</span>
         </div>
 
-        <Link
-          href="/student/scan"
-          className="mt-6 inline-flex items-center gap-2 rounded-sm bg-ink-950 px-5 py-2.5 text-sm font-medium text-paper transition hover:bg-ink-800"
-        >
+        <Button href="/student/scan" className="mt-6">
           Scan Attendance QR
-        </Link>
+        </Button>
 
         <section className="mt-10">
           <h2 className="mb-3 font-display text-lg font-semibold text-ink-950">Today's Classes</h2>
           <div className="grid gap-3 sm:grid-cols-2">
             {classes.map((c: any) => (
-              <div key={c.id} className="rounded-sm border border-ink-900/10 bg-white px-5 py-4">
+              <Card key={c.id}>
                 <div className="font-medium text-ink-950">{c.subject}</div>
                 <div className="text-xs text-ink-700">{c.name}</div>
-              </div>
+              </Card>
             ))}
-            {classes.length === 0 && <p className="text-sm text-ink-700/60">No classes assigned yet.</p>}
+            {classes.length === 0 && <EmptyState className="sm:col-span-2" message="No classes assigned yet." />}
           </div>
         </section>
 
@@ -92,7 +91,7 @@ export default async function StudentDashboardPage() {
                 </thead>
                 <tbody>
                   {(records ?? []).map((r: any) => (
-                    <tr key={r.id} className="border-b border-ink-900/5 last:border-0">
+                    <tr key={r.id} className="border-b border-ink-900/5 transition hover:bg-ink-900/[0.02] last:border-0">
                       <td className="px-4 py-2.5 text-ink-950">{r.attendance_sessions?.subject}</td>
                       <td className="px-4 py-2.5 text-ink-700">{new Date(r.marked_at).toLocaleString()}</td>
                       <td className="px-4 py-2.5 capitalize text-ink-950">{r.status}</td>
