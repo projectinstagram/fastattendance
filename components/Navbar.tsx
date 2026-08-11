@@ -59,7 +59,7 @@ export default function Navbar({
           </div>
           <button
             onClick={signOut}
-            className="hidden rounded-sm border border-ink-900/15 px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-ink-900/5 sm:inline-block"
+            className="hidden rounded-lg border border-ink-900/15 px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-ink-900/5 sm:inline-block"
           >
             Log out
           </button>
@@ -67,7 +67,7 @@ export default function Navbar({
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
-            className="flex h-8 w-8 items-center justify-center rounded-sm border border-ink-900/15 text-ink-700 md:hidden"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-ink-900/15 text-ink-700 md:hidden"
           >
             <span className="sr-only">Menu</span>
             {menuOpen ? "✕" : "☰"}
@@ -83,7 +83,7 @@ export default function Navbar({
                 key={l.href}
                 href={l.href}
                 onClick={() => setMenuOpen(false)}
-                className={`rounded-sm px-3 py-2 text-sm transition ${
+                className={`rounded-lg px-3 py-2 text-sm transition ${
                   pathname === l.href ? "bg-ink-900/5 font-medium text-ink-950" : "text-ink-700"
                 }`}
               >
@@ -98,7 +98,7 @@ export default function Navbar({
             </div>
             <button
               onClick={signOut}
-              className="rounded-sm border border-ink-900/15 px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-ink-900/5"
+              className="rounded-lg border border-ink-900/15 px-3 py-1.5 text-xs font-medium text-ink-700 transition hover:bg-ink-900/5"
             >
               Log out
             </button>

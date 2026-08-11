@@ -1,10 +1,12 @@
+import { SURFACE_CLASS } from "./Card";
+
 export function Skeleton({ className = "" }: { className?: string }) {
-  return <div className={`animate-pulse rounded-sm bg-ink-900/[0.06] ${className}`} />;
+  return <div className={`animate-pulse rounded-md bg-ink-900/[0.06] ${className}`} />;
 }
 
 export function SkeletonTable({ rows = 5, cols = 4 }: { rows?: number; cols?: number }) {
   return (
-    <div className="overflow-hidden rounded-sm border border-ink-900/10 bg-white">
+    <div className={`overflow-hidden ${SURFACE_CLASS}`}>
       <div className="border-b border-ink-900/10 bg-ink-900/[0.03] px-4 py-2.5">
         <Skeleton className="h-3 w-24" />
       </div>
@@ -25,7 +27,7 @@ export function SkeletonCards({ count = 4 }: { count?: number }) {
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="rounded-sm border border-ink-900/10 bg-white px-5 py-4">
+        <div key={i} className={`px-5 py-4 ${SURFACE_CLASS}`}>
           <Skeleton className="h-3 w-16" />
           <Skeleton className="mt-3 h-6 w-10" />
         </div>

@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { createClient } from "@/lib/supabase/client";
 import type { ClassRow } from "@/types/database";
 import Button from "@/components/ui/Button";
+import { SURFACE_CLASS } from "@/components/ui/Card";
 
 export default function StartAttendancePage() {
   const router = useRouter();
@@ -80,7 +81,7 @@ export default function StartAttendancePage() {
       <h1 className="font-display text-2xl font-semibold text-ink-950">Start Attendance</h1>
       <p className="mt-1 text-sm text-ink-700">Configure the live session, then project the QR code.</p>
 
-      <form onSubmit={handleStart} className="mt-8 space-y-5 rounded-sm border border-ink-900/10 bg-white p-6">
+      <form onSubmit={handleStart} className={`mt-8 space-y-5 p-6 ${SURFACE_CLASS}`}>
         <Field label="Class">
           <select value={classId} onChange={(e) => setClassId(e.target.value)} className="input">
             {classes.map((c) => (
@@ -137,18 +138,6 @@ export default function StartAttendancePage() {
           {loading ? "Starting…" : "Start Attendance"}
         </Button>
       </form>
-
-      <style jsx global>{`
-        .input {
-          width: 100%;
-          border-radius: 3px;
-          border: 1px solid rgba(17, 26, 46, 0.15);
-          background: #fff;
-          padding: 0.55rem 0.7rem;
-          font-size: 0.875rem;
-          outline: none;
-        }
-      `}</style>
     </div>
   );
 }

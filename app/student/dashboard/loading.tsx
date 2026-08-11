@@ -15,7 +15,7 @@ export default function Loading() {
         <Skeleton className="mt-6 h-10 w-48" />
 
         <div className="mt-10 grid gap-6 sm:grid-cols-[200px_1fr]">
-          <Skeleton className="h-32 rounded-sm" />
+          <Skeleton className="h-32 rounded-lg" />
           <SkeletonTable rows={4} cols={3} />
         </div>
       </main>

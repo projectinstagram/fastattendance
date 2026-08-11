@@ -49,14 +49,7 @@ function LoginForm() {
       return;
     }
 
-    // TEMPORARY: show the real Supabase error detail (if the callback route
-    // attached one) so we can diagnose the deployed OAuth flow. Remove once
-    // confirmed working.
-    const detail = params.get("detail");
-    toast.error(
-      `${ERROR_MESSAGES[error] ?? "Something went wrong. Please try again."}${detail ? ` (${detail})` : ""}`,
-      { duration: 8000 }
-    );
+    toast.error(ERROR_MESSAGES[error] ?? "Something went wrong. Please try again.");
   }, [params]);
 
   async function handleGoogleSignIn() {

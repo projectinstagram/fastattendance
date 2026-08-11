@@ -48,7 +48,7 @@ export default function QRDisplay({
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative rounded-sm bg-white p-5 shadow-[0_0_0_1px_rgba(17,26,46,0.08)]">
+      <div className="relative overflow-hidden rounded-lg bg-white p-5 shadow-[0_1px_2px_rgba(11,18,32,0.06),0_16px_32px_-16px_rgba(11,18,32,0.25)]">
         <QRCode value={joinUrl} size={220} fgColor="#111A2E" bgColor="#FFFFFF" />
         <div
           className="absolute bottom-0 left-0 h-1 bg-brass-500 transition-[width] duration-1000 ease-linear"

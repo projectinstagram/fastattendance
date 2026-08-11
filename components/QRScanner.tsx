@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Scanner, type IDetectedBarcode } from "@yudiel/react-qr-scanner";
+import Button from "@/components/ui/Button";
+import { SURFACE_CLASS } from "@/components/ui/Card";
 
 export default function QRScanner({
   onResult,
@@ -18,7 +20,7 @@ export default function QRScanner({
 
   if (manualEntry) {
     return (
-      <div className="rounded-sm border border-ink-900/10 bg-white p-6">
+      <div className={`p-6 ${SURFACE_CLASS}`}>
         <p className="mb-3 text-sm text-ink-700">Enter the 6-digit code your teacher read out.</p>
         <div className="flex gap-2">
           <input
@@ -28,13 +30,9 @@ export default function QRScanner({
             className="input font-mono text-lg tracking-[0.3em]"
             placeholder="000000"
           />
-          <button
-            onClick={() => code.length === 6 && onManualCode?.(code)}
-            disabled={code.length !== 6}
-            className="rounded-sm bg-ink-950 px-4 text-sm font-medium text-paper disabled:opacity-40"
-          >
+          <Button onClick={() => code.length === 6 && onManualCode?.(code)} disabled={code.length !== 6}>
             Submit
-          </button>
+          </Button>
         </div>
         <button
           onClick={() => setManualEntry(false)}
@@ -48,7 +46,7 @@ export default function QRScanner({
 
   return (
     <div>
-      <div className="overflow-hidden rounded-sm border border-ink-900/10 bg-black">
+      <div className="overflow-hidden rounded-lg bg-black shadow-[0_1px_2px_rgba(11,18,32,0.04),0_12px_28px_-16px_rgba(11,18,32,0.16)]">
         <Scanner
           onScan={(codes: IDetectedBarcode[]) => {
             const value = codes[0]?.rawValue;
@@ -60,7 +58,7 @@ export default function QRScanner({
         />
       </div>
       {cameraError && (
-        <p className="mt-3 rounded-sm bg-signal-absent/10 p-3 text-sm text-signal-absent">{cameraError}</p>
+        <p className="mt-3 rounded-lg bg-signal-absent/10 p-3 text-sm text-signal-absent">{cameraError}</p>
       )}
       {allowManualCode && (
         <button

@@ -42,13 +42,7 @@ export async function GET(request: Request) {
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error || !data.session || !data.user) {
-    // TEMPORARY: surface the real Supabase error to the login page toast
-    // so we can see the actual cause instead of a generic message. Remove
-    // once the deployed OAuth flow is confirmed working.
-    console.error("exchangeCodeForSession failed:", error);
-    const failUrl = new URL("/login?error=auth_failed", url.origin);
-    if (error?.message) failUrl.searchParams.set("detail", error.message);
-    return NextResponse.redirect(failUrl);
+    return NextResponse.redirect(new URL("/login?error=auth_failed", url.origin));
   }
 
   const email = data.user.email ?? "";

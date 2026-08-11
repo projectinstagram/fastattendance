@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import type { AttendanceSession, ClassRow } from "@/types/database";
 import Button from "@/components/ui/Button";
+import { SURFACE_CLASS } from "@/components/ui/Card";
 
 type Result =
   | { state: "idle" }
@@ -102,14 +103,14 @@ export default function JoinConfirm({
 
   return (
     <div className="mx-auto max-w-md px-6 py-16">
-      <div className="rounded-sm border border-ink-900/10 bg-white p-6">
+      <div className={`p-6 ${SURFACE_CLASS}`}>
         <div className="text-xs uppercase tracking-wide text-ink-700/60">Attendance Session</div>
         <h1 className="mt-1 font-display text-2xl font-semibold text-ink-950">{classRow.subject}</h1>
         <div className="mt-1 text-sm text-ink-700">
           Class: {classRow.name} · Teacher: {teacherName}
         </div>
 
-        <div className="mt-6 grid grid-cols-2 gap-4 rounded-sm bg-ink-900/[0.03] p-4 text-sm">
+        <div className="mt-6 grid grid-cols-2 gap-4 rounded-lg bg-ink-900/[0.03] p-4 text-sm">
           <div>
             <div className="text-xs text-ink-700/60">Roll Number</div>
             <div className="roll-badge font-mono font-medium text-ink-950">{rollNumber}</div>
@@ -128,7 +129,7 @@ export default function JoinConfirm({
         </p>
 
         {result.state === "error" && (
-          <p className="mt-4 rounded-sm bg-signal-absent/10 p-3 text-sm text-signal-absent">{result.message}</p>
+          <p className="mt-4 rounded-lg bg-signal-absent/10 p-3 text-sm text-signal-absent">{result.message}</p>
         )}
 
         <Button onClick={markAttendance} loading={loading} className="mt-6 w-full">

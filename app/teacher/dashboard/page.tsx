@@ -3,9 +3,10 @@ import { requireTeacher } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import Navbar from "@/components/Navbar";
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
+import Card, { SURFACE_CLASS } from "@/components/ui/Card";
 import StatCard from "@/components/ui/StatCard";
 import EmptyState from "@/components/ui/EmptyState";
+import { BookIcon, BroadcastIcon, ListIcon, RingIcon } from "@/components/ui/icons";
 
 export const dynamic = "force-dynamic";
 
@@ -45,7 +46,7 @@ export default async function TeacherDashboardPage() {
   const attendancePct = recordTotal > 0 ? Math.round(((presentTotal + lateTotal) / recordTotal) * 100) : 0;
 
   return (
-    <div className="min-h-screen">
+    <div className="relative min-h-screen">
       <Navbar
         name={profile.name}
         role="teacher"
@@ -55,7 +56,13 @@ export default async function TeacherDashboardPage() {
         ]}
       />
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 h-64 opacity-60"
+        style={{ background: "radial-gradient(800px circle at 15% 0%, rgba(176,141,30,0.08), transparent 60%)" }}
+      />
+
+      <main className="relative mx-auto max-w-6xl px-6 py-10">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="font-display text-3xl font-semibold text-ink-950">Welcome, {profile.name}</h1>
@@ -65,10 +72,26 @@ export default async function TeacherDashboardPage() {
         </div>
 
         <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-          <StatCard label="Today's Classes" value={String(classes?.length ?? 0)} />
-          <StatCard label="Active Session" value={active.length > 0 ? "Live" : "None"} accent={active.length > 0} />
-          <StatCard label="Records (recent)" value={String(recordTotal)} />
-          <StatCard label="Attendance %" value={`${attendancePct}%`} />
+          <StatCard
+            label="Today's Classes"
+            value={String(classes?.length ?? 0)}
+            icon={<BookIcon />}
+            barColor="bg-ink-900/20"
+          />
+          <StatCard
+            label="Active Session"
+            value={active.length > 0 ? "Live" : "None"}
+            accent={active.length > 0}
+            icon={<BroadcastIcon />}
+            barColor={active.length > 0 ? "bg-brass-500" : "bg-ink-900/10"}
+          />
+          <StatCard label="Records (recent)" value={String(recordTotal)} icon={<ListIcon />} barColor="bg-ink-900/20" />
+          <StatCard
+            label="Attendance %"
+            value={`${attendancePct}%`}
+            icon={<RingIcon />}
+            barColor="bg-signal-present"
+          />
         </div>
 
         {active.length > 0 && (
@@ -79,7 +102,7 @@ export default async function TeacherDashboardPage() {
                 <Link
                   key={s.id}
                   href={`/teacher/session/${s.id}`}
-                  className="flex items-center justify-between rounded-sm border border-brass-500/30 bg-brass-400/10 px-5 py-4 transition hover:bg-brass-400/15"
+                  className="flex items-center justify-between rounded-lg border border-brass-500/30 bg-gradient-to-br from-brass-400/10 to-brass-400/[0.03] px-5 py-4 transition hover:from-brass-400/15 hover:to-brass-400/5"
                 >
                   <div>
                     <div className="font-medium text-ink-950">{(s as any).classes?.name}</div>
@@ -99,16 +122,22 @@ export default async function TeacherDashboardPage() {
           <h2 className="mb-3 font-display text-lg font-semibold text-ink-950">Classes</h2>
           <div className="grid gap-3 md:grid-cols-2">
             {(classes ?? []).map((c) => (
-              <Card key={c.id}>
-                <div className="font-medium text-ink-950">{c.name}</div>
-                <div className="text-xs text-ink-700">
-                  {c.subject} · {c.department} Sem {c.semester} · Sec {c.section}
+              <Card key={c.id} className="flex items-start gap-3">
+                <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-brass-400/15 text-brass-600">
+                  <BookIcon className="h-4 w-4" />
+                </span>
+                <div>
+                  <div className="font-medium text-ink-950">{c.name}</div>
+                  <div className="text-xs text-ink-700">
+                    {c.subject} · {c.department} Sem {c.semester} · Sec {c.section}
+                  </div>
                 </div>
               </Card>
             ))}
             {(!classes || classes.length === 0) && (
               <EmptyState
                 className="md:col-span-2"
+                icon={<BookIcon />}
                 message="No classes yet. Add one from Supabase or your admin tooling to get started."
               />
             )}
@@ -117,7 +146,7 @@ export default async function TeacherDashboardPage() {
 
         <section className="mt-10">
           <h2 className="mb-3 font-display text-lg font-semibold text-ink-950">Previous Sessions</h2>
-          <div className="overflow-hidden rounded-sm border border-ink-900/10 bg-white">
+          <div className={`overflow-hidden ${SURFACE_CLASS}`}>
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-ink-900/10 bg-ink-900/[0.03] text-left text-xs uppercase tracking-wide text-ink-700/70">

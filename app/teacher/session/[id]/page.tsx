@@ -7,6 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import QRDisplay from "@/components/QRDisplay";
 import AttendanceTable from "@/components/AttendanceTable";
 import Button from "@/components/ui/Button";
+import { SURFACE_CLASS } from "@/components/ui/Card";
 import StatCard from "@/components/ui/StatCard";
 import ConfirmDialog from "@/components/ui/ConfirmDialog";
 import { Skeleton, SkeletonTable } from "@/components/ui/Skeleton";
@@ -148,7 +149,7 @@ export default function TeacherSessionPage() {
         <Skeleton className="h-8 w-72" />
         <Skeleton className="mt-3 h-4 w-40" />
         <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
-          <Skeleton className="h-96 rounded-sm" />
+          <Skeleton className="h-96 rounded-lg" />
           <SkeletonTable rows={6} cols={4} />
         </div>
       </div>
@@ -208,7 +209,7 @@ export default function TeacherSessionPage() {
         </div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[280px_1fr]">
-          <div className="flex flex-col items-center gap-6 rounded-sm border border-ink-900/10 bg-white p-6 lg:sticky lg:top-8 lg:self-start">
+          <div className={`flex flex-col items-center gap-6 p-6 lg:sticky lg:top-8 lg:self-start ${SURFACE_CLASS}`}>
             {session.is_active && qrToken && qrExpiresAt ? (
               <QRDisplay
                 sessionId={sessionId}
@@ -230,7 +231,7 @@ export default function TeacherSessionPage() {
             </div>
 
             {securityAlerts > 0 && (
-              <div className="w-full rounded-sm bg-signal-absent/10 px-3 py-2 text-xs text-signal-absent">
+              <div className="w-full rounded-lg bg-signal-absent/10 px-3 py-2 text-xs text-signal-absent">
                 ⚠ {securityAlerts} suspicious attendance {securityAlerts === 1 ? "attempt" : "attempts"}
               </div>
             )}

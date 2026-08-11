@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import type { RosterRow } from "@/lib/attendance";
+import { SURFACE_CLASS } from "@/components/ui/Card";
 
 const STATUS_STYLES: Record<string, string> = {
   present: "bg-signal-present/10 text-signal-present",
@@ -37,7 +38,7 @@ export default function AttendanceTable({ rows }: { rows: RosterRow[] }) {
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`rounded-sm px-3 py-1.5 text-xs font-medium capitalize transition ${
+              className={`rounded-lg px-3 py-1.5 text-xs font-medium capitalize transition ${
                 filter === f ? "bg-ink-950 text-paper" : "bg-white text-ink-700 hover:bg-ink-900/5"
               }`}
             >
@@ -47,7 +48,7 @@ export default function AttendanceTable({ rows }: { rows: RosterRow[] }) {
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-sm border border-ink-900/10 bg-white">
+      <div className={`overflow-hidden ${SURFACE_CLASS}`}>
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-ink-900/10 bg-ink-900/[0.03] text-left text-xs uppercase tracking-wide text-ink-700/70">
@@ -67,7 +68,7 @@ export default function AttendanceTable({ rows }: { rows: RosterRow[] }) {
                 </td>
                 <td className="px-4 py-2.5">
                   <span
-                    className={`rounded-sm px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[r.status]}`}
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[r.status]}`}
                   >
                     {r.status}
                   </span>

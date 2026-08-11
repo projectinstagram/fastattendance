@@ -23,6 +23,22 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.input {
+  width: 100%;
+  border-radius: 8px;
+  border: 1px solid rgba(17, 26, 46, 0.12);
+  background: #fff;
+  padding: 0.6rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input:focus {
+  border-color: rgba(176, 141, 30, 0.5);
+  box-shadow: 0 0 0 3px rgba(176, 141, 30, 0.14);
+}
+
 @keyframes qr-pulse {
   0%,
   100% {

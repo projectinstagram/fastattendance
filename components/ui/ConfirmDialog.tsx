@@ -95,7 +95,7 @@ export default function ConfirmDialog({
         aria-modal="true"
         aria-labelledby="confirm-dialog-title"
         aria-describedby={description ? "confirm-dialog-description" : undefined}
-        className={`relative w-full max-w-sm rounded-sm border border-ink-900/10 bg-white p-6 shadow-xl transition-transform duration-150 ${
+        className={`relative w-full max-w-sm rounded-lg border border-ink-900/10 bg-white p-6 shadow-2xl transition-transform duration-150 ${
           closing ? "scale-95" : "animate-scale-in scale-100"
         }`}
       >
